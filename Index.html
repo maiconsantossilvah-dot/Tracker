@@ -4,109 +4,131 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PhotoTrace — Rastreador de Metadados</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exif-js/2.3.0/exif.min.js"></script>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #0a0a0b; --bg2: #111114; --bg3: #18181c;
-  --border: rgba(255,255,255,0.07); --border2: rgba(255,255,255,0.12);
-  --text: #f0eee8; --muted: #888;
-  --accent: #c8ff57; --accent2: #57c8ff; --danger: #ff5757;
-  --fd: 'Syne', sans-serif; --fb: 'DM Sans', sans-serif; --fm: 'DM Mono', monospace;
-  --r: 12px; --rs: 8px;
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0b;--bg2:#111114;--bg3:#18181c;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
+  --tx:#f0eee8;--mu:#777;
+  --ac:#c8ff57;--ac2:#57c8ff;--re:#ff5757;
+  --fd:'Syne',sans-serif;--fb:'DM Sans',sans-serif;--fm:'DM Mono',monospace;
+  --r:12px;--rs:8px
 }
-html { scroll-behavior: smooth; }
-body { font-family: var(--fb); background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
-body::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-  background-image: linear-gradient(rgba(200,255,87,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(200,255,87,0.025) 1px,transparent 1px);
-  background-size: 60px 60px;
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(200,255,87,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(200,255,87,.025) 1px,transparent 1px);
+  background-size:60px 60px
 }
-header {
-  position: sticky; top: 0; z-index: 100;
-  padding: 1.2rem 2.5rem; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-  backdrop-filter: blur(12px); background: rgba(10,10,11,0.88);
+header{
+  position:sticky;top:0;z-index:100;
+  padding:1.2rem 2.5rem;border-bottom:1px solid var(--bd);
+  display:flex;align-items:center;justify-content:space-between;
+  backdrop-filter:blur(12px);background:rgba(10,10,11,.88)
 }
-.logo { display:flex; align-items:center; gap:10px; }
-.logo-icon { width:34px;height:34px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px; }
-.logo-text { font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-0.02em; }
-.logo-text span { color:var(--accent); }
-.header-tag { font-family:var(--fm);font-size:11px;color:var(--muted);border:1px solid var(--border2);padding:4px 10px;border-radius:99px; }
-main { position:relative;z-index:1;max-width:860px;margin:0 auto;padding:3rem 2rem 5rem; }
-.hero { text-align:center;margin-bottom:2.5rem;animation:fadeUp .5s ease both; }
-.hero-eyebrow { font-family:var(--fm);font-size:11px;color:var(--accent);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.9rem; }
-.hero h1 { font-family:var(--fd);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:.9rem; }
-.hero h1 em { font-style:normal;color:var(--accent); }
-.hero p { font-size:15px;color:var(--muted);max-width:460px;margin:0 auto;line-height:1.6; }
-#drop-zone {
+.logo{display:flex;align-items:center;gap:10px}
+.logo-icon{width:34px;height:34px;background:var(--ac);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.logo-text{font-family:var(--fd);font-size:20px;font-weight:800;letter-spacing:-.02em}
+.logo-text span{color:var(--ac)}
+.htag{font-family:var(--fm);font-size:11px;color:var(--mu);border:1px solid var(--bd2);padding:4px 10px;border-radius:99px}
+main{position:relative;z-index:1;max-width:860px;margin:0 auto;padding:3rem 2rem 5rem}
+.hero{text-align:center;margin-bottom:2.5rem;animation:fu .5s ease both}
+.eyebrow{font-family:var(--fm);font-size:11px;color:var(--ac);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.9rem}
+h1{font-family:var(--fd);font-size:clamp(2rem,5vw,3rem);font-weight:800;line-height:1.1;letter-spacing:-.03em;margin-bottom:.9rem}
+h1 em{font-style:normal;color:var(--ac)}
+.sub{font-size:15px;color:var(--mu);max-width:460px;margin:0 auto;line-height:1.6}
+#dz{
   border:1.5px dashed rgba(200,255,87,.22);border-radius:var(--r);
   padding:3rem 2rem;text-align:center;cursor:pointer;
   transition:all .2s;background:rgba(200,255,87,.015);
-  position:relative;overflow:hidden;animation:fadeUp .5s .08s ease both;
+  position:relative;overflow:hidden;animation:fu .5s .08s ease both
 }
-#drop-zone::after { content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 110%,rgba(200,255,87,.05),transparent 65%); }
-#drop-zone:hover,#drop-zone.drag-over { border-color:rgba(200,255,87,.45);background:rgba(200,255,87,.03); }
-#drop-zone input { display:none; }
-.drop-icon { width:60px;height:60px;background:rgba(200,255,87,.07);border:1px solid rgba(200,255,87,.18);border-radius:14px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .2s; }
-#drop-zone:hover .drop-icon { transform:scale(1.06) rotate(-3deg); }
-.drop-title { font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:5px; }
-.drop-sub { font-size:13px;color:var(--muted);margin-bottom:1.5rem; }
-.drop-btn { display:inline-block;background:var(--accent);color:#0a0a0b;font-family:var(--fd);font-weight:700;font-size:13px;padding:10px 26px;border-radius:99px;transition:opacity .2s,transform .15s; }
-.drop-btn:hover { opacity:.85;transform:scale(.97); }
-#results { display:none;animation:fadeUp .35s ease both; }
-.photo-header { display:flex;gap:1.25rem;align-items:flex-start;margin-bottom:1.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r); }
-#img-preview { width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--border2);flex-shrink:0; }
-.photo-info { flex:1;min-width:0; }
-.photo-name { font-family:var(--fd);font-size:15px;font-weight:700;word-break:break-all;margin-bottom:3px; }
-.photo-meta { font-size:12px;color:var(--muted);font-family:var(--fm);margin-bottom:9px; }
-.status-row { display:flex;gap:7px;flex-wrap:wrap; }
-.badge { font-family:var(--fm);font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid;letter-spacing:.05em;text-transform:uppercase; }
-.b-ok  { color:var(--accent); border-color:rgba(200,255,87,.3);  background:rgba(200,255,87,.07); }
-.b-no  { color:var(--danger);  border-color:rgba(255,87,87,.3);   background:rgba(255,87,87,.07); }
-.b-info{ color:var(--accent2); border-color:rgba(87,200,255,.3);  background:rgba(87,200,255,.07); }
-.grid { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem; }
-@media(max-width:580px){.grid{grid-template-columns:1fr;}}
-.card { background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:1.1rem 1.2rem;transition:border-color .18s; }
-.card:hover { border-color:var(--border2); }
-.full { grid-column:1/-1; }
-.card-title { font-family:var(--fm);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem;display:flex;align-items:center;gap:7px; }
-.card-title::before { content:'';display:inline-block;width:5px;height:5px;background:var(--accent);border-radius:50%; }
-.row { display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--border); }
-.row:last-child { border-bottom:none; }
-.lbl { font-size:12px;color:var(--muted);flex-shrink:0; }
-.val { font-size:12px;font-family:var(--fm);color:var(--text);text-align:right;word-break:break-all; }
-.hi  { color:var(--accent); }
-.hi2 { color:var(--accent2); }
-.cg { display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem; }
-@media(max-width:500px){.cg{grid-template-columns:1fr 1fr;}}
-.cb { background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:11px;text-align:center; }
-.cl { font-size:10px;color:var(--muted);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px; }
-.cv { font-family:var(--fm);font-size:14px;font-weight:500;color:var(--accent); }
-#map { height:280px;border-radius:var(--rs);border:1px solid var(--border);margin-bottom:.9rem;background:var(--bg3); }
-#map .leaflet-tile { filter:invert(1) hue-rotate(180deg) brightness(.85) contrast(.9) saturate(.7); }
-#map .leaflet-container { background:#18181c; }
-.maps-btn { display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-family:var(--fm);font-size:11px;color:var(--accent2);border:1px solid rgba(87,200,255,.2);padding:6px 14px;border-radius:99px;transition:background .15s; }
-.maps-btn:hover { background:rgba(87,200,255,.07); }
-#no-gps { display:none;text-align:center;padding:1.75rem;color:var(--muted);font-size:13px;line-height:1.7; }
-#no-gps strong { display:block;font-family:var(--fd);font-size:15px;color:var(--danger);margin-bottom:5px; }
-.tags-btn { background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--fm);font-size:11px;padding:5px 14px;border-radius:99px;cursor:pointer;transition:all .15s;margin-top:.7rem; }
-.tags-btn:hover { color:var(--text);border-color:rgba(255,255,255,.25); }
-#tags-body { display:none;margin-top:1rem;max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border2) transparent; }
-#tags-body .lbl { font-family:var(--fm);font-size:11px; }
-#tags-body .val { font-size:11px; }
-.reset-bar { margin-top:1.25rem;display:flex;gap:10px; }
-.btn-r { flex:1;background:transparent;border:1px solid var(--border2);color:var(--muted);font-family:var(--fd);font-weight:600;font-size:13px;padding:11px;border-radius:var(--rs);cursor:pointer;transition:all .15s; }
-.btn-r:hover { color:var(--text);border-color:rgba(255,255,255,.25); }
-.btn-e { background:var(--accent);color:#0a0a0b;border:none;font-family:var(--fd);font-weight:700;font-size:13px;padding:11px 22px;border-radius:var(--rs);cursor:pointer;transition:opacity .15s; }
-.btn-e:hover { opacity:.85; }
-footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px solid var(--border);font-family:var(--fm);font-size:11px;color:var(--muted); }
-@keyframes fadeUp { from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)} }
-::-webkit-scrollbar { width:4px; }
-::-webkit-scrollbar-thumb { background:var(--border2);border-radius:4px; }
+#dz::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 110%,rgba(200,255,87,.05),transparent 65%)}
+#dz:hover,#dz.on{border-color:rgba(200,255,87,.45);background:rgba(200,255,87,.03)}
+#dz input{display:none}
+.dicon{width:60px;height:60px;background:rgba(200,255,87,.07);border:1px solid rgba(200,255,87,.18);border-radius:14px;margin:0 auto 1.25rem;display:flex;align-items:center;justify-content:center;font-size:26px;transition:transform .2s}
+#dz:hover .dicon{transform:scale(1.06) rotate(-3deg)}
+.dtitle{font-family:var(--fd);font-size:18px;font-weight:700;margin-bottom:5px}
+.dsub{font-size:13px;color:var(--mu);margin-bottom:1.5rem}
+.dbtn{display:inline-block;background:var(--ac);color:#0a0a0b;font-family:var(--fd);font-weight:700;font-size:13px;padding:10px 26px;border-radius:99px;transition:opacity .2s,transform .15s}
+.dbtn:hover{opacity:.85;transform:scale(.97)}
+#res{display:none;animation:fu .35s ease both}
+.phead{display:flex;gap:1.25rem;align-items:flex-start;margin-bottom:1.5rem;padding:1.25rem;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r)}
+#prev{width:84px;height:84px;object-fit:cover;border-radius:8px;border:1px solid var(--bd2);flex-shrink:0}
+.pinfo{flex:1;min-width:0}
+.pname{font-family:var(--fd);font-size:15px;font-weight:700;word-break:break-all;margin-bottom:3px}
+.pmeta{font-size:12px;color:var(--mu);font-family:var(--fm);margin-bottom:9px}
+.sr{display:flex;gap:7px;flex-wrap:wrap}
+.badge{font-family:var(--fm);font-size:10px;padding:3px 9px;border-radius:99px;border:1px solid;letter-spacing:.05em;text-transform:uppercase}
+.bok{color:var(--ac);border-color:rgba(200,255,87,.3);background:rgba(200,255,87,.07)}
+.bno{color:var(--re);border-color:rgba(255,87,87,.3);background:rgba(255,87,87,.07)}
+.bin{color:var(--ac2);border-color:rgba(87,200,255,.3);background:rgba(87,200,255,.07)}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+@media(max-width:580px){.grid{grid-template-columns:1fr}}
+.card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:1.1rem 1.2rem;transition:border-color .18s}
+.card:hover{border-color:var(--bd2)}
+.full{grid-column:1/-1}
+.ctitle{font-family:var(--fm);font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.12em;margin-bottom:.9rem;display:flex;align-items:center;gap:7px}
+.ctitle::before{content:'';display:inline-block;width:5px;height:5px;background:var(--ac);border-radius:50%}
+.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:5px 0;border-bottom:1px solid var(--bd)}
+.row:last-child{border-bottom:none}
+.lbl{font-size:12px;color:var(--mu);flex-shrink:0}
+.val{font-size:12px;font-family:var(--fm);color:var(--tx);text-align:right;word-break:break-all}
+.hi{color:var(--ac)}
+.hi2{color:var(--ac2)}
+.cgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1rem}
+@media(max-width:500px){.cgrid{grid-template-columns:1fr 1fr}}
+.cbox{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--rs);padding:11px;text-align:center}
+.clbl{font-size:10px;color:var(--mu);font-family:var(--fm);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.cval{font-family:var(--fm);font-size:14px;font-weight:500;color:var(--ac)}
+
+/* MAP — iframe embed, works on HTTPS */
+.map-wrap{
+  position:relative;border-radius:var(--rs);overflow:hidden;
+  height:300px;border:1px solid var(--bd);margin-bottom:.9rem;
+  background:var(--bg3)
+}
+.map-wrap iframe{
+  width:100%;height:100%;border:none;display:block;
+  opacity:0;transition:opacity .4s
+}
+.map-wrap iframe.rdy{opacity:1}
+.map-spinner{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:10px;
+  font-family:var(--fm);font-size:12px;color:var(--mu);
+  pointer-events:none;transition:opacity .3s
+}
+.spin{width:20px;height:20px;border:2px solid var(--bd2);border-top-color:var(--ac);border-radius:50%;animation:sp .8s linear infinite}
+.map-open-btn{
+  display:inline-flex;align-items:center;gap:6px;text-decoration:none;
+  font-family:var(--fm);font-size:11px;color:var(--ac2);
+  border:1px solid rgba(87,200,255,.2);padding:6px 14px;
+  border-radius:99px;transition:background .15s
+}
+.map-open-btn:hover{background:rgba(87,200,255,.07)}
+
+#no-gps{display:none;text-align:center;padding:1.75rem;color:var(--mu);font-size:13px;line-height:1.7}
+#no-gps strong{display:block;font-family:var(--fd);font-size:15px;color:var(--re);margin-bottom:5px}
+.tbtn{background:transparent;border:1px solid var(--bd2);color:var(--mu);font-family:var(--fm);font-size:11px;padding:5px 14px;border-radius:99px;cursor:pointer;transition:all .15s;margin-top:.7rem}
+.tbtn:hover{color:var(--tx);border-color:rgba(255,255,255,.25)}
+#tbody{display:none;margin-top:1rem;max-height:280px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--bd2) transparent}
+#tbody .lbl{font-family:var(--fm);font-size:11px}
+#tbody .val{font-size:11px}
+.rbar{margin-top:1.25rem;display:flex;gap:10px}
+.btnr{flex:1;background:transparent;border:1px solid var(--bd2);color:var(--mu);font-family:var(--fd);font-weight:600;font-size:13px;padding:11px;border-radius:var(--rs);cursor:pointer;transition:all .15s}
+.btnr:hover{color:var(--tx);border-color:rgba(255,255,255,.25)}
+.btne{background:var(--ac);color:#0a0a0b;border:none;font-family:var(--fd);font-weight:700;font-size:13px;padding:11px 22px;border-radius:var(--rs);cursor:pointer;transition:opacity .15s}
+.btne:hover{opacity:.85}
+footer{position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px solid var(--bd);font-family:var(--fm);font-size:11px;color:var(--mu)}
+@keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes sp{to{transform:rotate(360deg)}}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:4px}
 </style>
 </head>
 <body>
@@ -116,39 +138,39 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
     <div class="logo-icon">📷</div>
     <div class="logo-text">Photo<span>Trace</span></div>
   </div>
-  <div class="header-tag">v2.0 · EXIF Extractor</div>
+  <div class="htag">v3.0 · EXIF Extractor</div>
 </header>
 
 <main>
   <div class="hero">
-    <div class="hero-eyebrow">// rastreamento de metadados</div>
+    <div class="eyebrow">// rastreamento de metadados</div>
     <h1>Descubra tudo sobre<br><em>qualquer foto</em></h1>
-    <p>Modelo do dispositivo, configurações de câmera, data e hora — e se tiver GPS, a localização exata no mapa.</p>
+    <p class="sub">Modelo do dispositivo, configurações de câmera, data e hora — e se tiver GPS, a localização exata no mapa.</p>
   </div>
 
-  <div id="drop-zone"
+  <div id="dz"
     onclick="document.getElementById('fi').click()"
-    ondragover="ev(event,1)" ondragleave="ev(event,0)" ondrop="drop(event)">
+    ondragover="dov(event)" ondragleave="dol()" ondrop="ddr(event)">
     <input type="file" id="fi" accept="image/*" onchange="load(this.files[0])">
-    <div class="drop-icon">🔍</div>
-    <div class="drop-title">Arraste a foto aqui</div>
-    <div class="drop-sub">ou clique para selecionar &nbsp;·&nbsp; JPG, JPEG, TIFF</div>
-    <div class="drop-btn">Selecionar foto</div>
+    <div class="dicon">🔍</div>
+    <div class="dtitle">Arraste a foto aqui</div>
+    <div class="dsub">ou clique para selecionar &nbsp;·&nbsp; JPG, JPEG, TIFF</div>
+    <div class="dbtn">Selecionar foto</div>
   </div>
 
-  <div id="results">
-    <div class="photo-header">
+  <div id="res">
+    <div class="phead">
       <img id="prev" alt="">
-      <div class="photo-info">
-        <div class="photo-name" id="fname"></div>
-        <div class="photo-meta" id="fmeta"></div>
-        <div class="status-row" id="sr"></div>
+      <div class="pinfo">
+        <div class="pname" id="fn"></div>
+        <div class="pmeta" id="fm"></div>
+        <div class="sr" id="sr"></div>
       </div>
     </div>
 
     <div class="grid">
       <div class="card">
-        <div class="card-title">Dispositivo</div>
+        <div class="ctitle">Dispositivo</div>
         <div class="row"><span class="lbl">Fabricante</span><span class="val" id="make">—</span></div>
         <div class="row"><span class="lbl">Modelo</span><span class="val hi" id="model">—</span></div>
         <div class="row"><span class="lbl">Software / OS</span><span class="val" id="sw">—</span></div>
@@ -156,7 +178,7 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
       </div>
 
       <div class="card">
-        <div class="card-title">Data &amp; Hora</div>
+        <div class="ctitle">Data &amp; Hora</div>
         <div class="row"><span class="lbl">Capturada em</span><span class="val hi" id="dto">—</span></div>
         <div class="row"><span class="lbl">Digitalizada em</span><span class="val" id="dtd">—</span></div>
         <div class="row"><span class="lbl">Modificada em</span><span class="val" id="dtm">—</span></div>
@@ -164,7 +186,7 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
       </div>
 
       <div class="card">
-        <div class="card-title">Câmera</div>
+        <div class="ctitle">Câmera</div>
         <div class="row"><span class="lbl">Abertura</span><span class="val hi" id="ap">—</span></div>
         <div class="row"><span class="lbl">Velocidade</span><span class="val" id="ex">—</span></div>
         <div class="row"><span class="lbl">ISO</span><span class="val" id="iso">—</span></div>
@@ -176,7 +198,7 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
       </div>
 
       <div class="card">
-        <div class="card-title">Imagem</div>
+        <div class="ctitle">Imagem</div>
         <div class="row"><span class="lbl">Dimensões</span><span class="val hi" id="dim">—</span></div>
         <div class="row"><span class="lbl">Resolução</span><span class="val" id="dpi">—</span></div>
         <div class="row"><span class="lbl">Orientação</span><span class="val" id="ori">—</span></div>
@@ -188,19 +210,29 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
       </div>
 
       <div class="card full">
-        <div class="card-title">Localização GPS</div>
+        <div class="ctitle">Localização GPS</div>
         <div id="gps-found" style="display:none">
-          <div class="cg">
-            <div class="cb"><div class="cl">Latitude</div><div class="cv" id="lat">—</div></div>
-            <div class="cb"><div class="cl">Longitude</div><div class="cv" id="lon">—</div></div>
-            <div class="cb"><div class="cl">Altitude</div><div class="cv" id="alt">—</div></div>
+          <div class="cgrid">
+            <div class="cbox"><div class="clbl">Latitude</div><div class="cval" id="lat">—</div></div>
+            <div class="cbox"><div class="clbl">Longitude</div><div class="cval" id="lon">—</div></div>
+            <div class="cbox"><div class="clbl">Altitude</div><div class="cval" id="alt">—</div></div>
           </div>
-          <div style="display:flex;gap:16px;margin-bottom:1rem;flex-wrap:wrap;">
-            <div class="row" style="flex:1;min-width:160px;border-bottom:none;padding:0;"><span class="lbl">Precisão GPS</span><span class="val" id="gdop">—</span></div>
-            <div class="row" style="flex:1;min-width:160px;border-bottom:none;padding:0;"><span class="lbl">Direção</span><span class="val" id="gdir">—</span></div>
+          <div style="display:flex;gap:16px;margin-bottom:1rem;flex-wrap:wrap">
+            <div class="row" style="flex:1;min-width:160px;border-bottom:none;padding:0"><span class="lbl">Precisão GPS</span><span class="val" id="gdop">—</span></div>
+            <div class="row" style="flex:1;min-width:160px;border-bottom:none;padding:0"><span class="lbl">Direção</span><span class="val" id="gdir">—</span></div>
           </div>
-          <div id="map"></div>
-          <a id="glink" class="maps-btn" href="#" target="_blank">
+
+          <!-- Map: OpenStreetMap embed via iframe — works on HTTPS (GitHub Pages) -->
+          <div class="map-wrap" id="map-wrap">
+            <div class="map-spinner" id="map-spin"><div class="spin"></div>Carregando mapa...</div>
+            <iframe id="map-iframe"
+              sandbox="allow-scripts allow-same-origin"
+              referrerpolicy="no-referrer"
+              onload="iframeLoaded()"
+              title="Mapa de localização"></iframe>
+          </div>
+
+          <a id="glink" class="map-open-btn" href="#" target="_blank" rel="noopener">
             <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><path d="M6 1L11 6L6 11M11 6H1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Abrir no Google Maps
           </a>
@@ -214,15 +246,15 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
       </div>
 
       <div class="card full">
-        <div class="card-title">Todos os metadados brutos</div>
-        <button class="tags-btn" id="tbtn" onclick="toggleTags()">Mostrar todos os campos EXIF</button>
-        <div id="tags-body"></div>
+        <div class="ctitle">Todos os metadados brutos</div>
+        <button class="tbtn" id="tbtn" onclick="toggleTags()">Mostrar todos os campos EXIF</button>
+        <div id="tbody"></div>
       </div>
     </div>
 
-    <div class="reset-bar">
-      <button class="btn-r" onclick="reset()">← Analisar outra foto</button>
-      <button class="btn-e" onclick="exportJSON()">Exportar JSON</button>
+    <div class="rbar">
+      <button class="btnr" onclick="reset()">← Analisar outra foto</button>
+      <button class="btne" onclick="exportJSON()">Exportar JSON</button>
     </div>
   </div>
 </main>
@@ -230,164 +262,203 @@ footer { position:relative;z-index:1;text-align:center;padding:2rem;border-top:1
 <footer>PhotoTrace · Processamento 100% local — nenhum dado é enviado para servidores · EXIF 2.3</footer>
 
 <script>
-var lmap = null, cdata = {};
+var cdata = {};
 
-function ev(e,on){ e.preventDefault(); document.getElementById('drop-zone').classList[on?'add':'remove']('drag-over'); }
-function drop(e){ e.preventDefault(); ev(e,0); load(e.dataTransfer.files[0]); }
+/* ---------- drag/drop ---------- */
+function dov(e){ e.preventDefault(); document.getElementById('dz').classList.add('on'); }
+function dol(){ document.getElementById('dz').classList.remove('on'); }
+function ddr(e){ e.preventDefault(); dol(); load(e.dataTransfer.files[0]); }
 
+/* ---------- load file ---------- */
 function load(file){
   if(!file) return;
   cdata = {fileName:file.name, fileSize:file.size, mimeType:file.type};
   var r = new FileReader();
-  r.onload = function(ev){
-    var src = ev.target.result;
+  r.onload = function(e){
+    var src = e.target.result;
     var img = new Image();
     img.onload = function(){
       document.getElementById('prev').src = src;
-      document.getElementById('fname').textContent = file.name;
-      var sz = file.size>1048576 ? (file.size/1048576).toFixed(2)+' MB' : (file.size/1024).toFixed(1)+' KB';
-      document.getElementById('fmeta').textContent = img.naturalWidth+'×'+img.naturalHeight+'px · '+sz+' · '+(file.type||'image/jpeg');
+      document.getElementById('fn').textContent = file.name;
+      var sz = file.size > 1048576
+        ? (file.size/1048576).toFixed(2)+' MB'
+        : (file.size/1024).toFixed(1)+' KB';
+      document.getElementById('fm').textContent =
+        img.naturalWidth+'×'+img.naturalHeight+'px · '+sz+' · '+(file.type||'image/jpeg');
       sv('dim', img.naturalWidth+' × '+img.naturalHeight+' px', 'hi');
-      sv('fsz', sz); sv('mime', file.type||'—');
-      EXIF.getData(img, function(){ populate(this, file); });
+      sv('fsz', sz);
+      sv('mime', file.type||'—');
+      EXIF.getData(img, function(){ populate(this); });
     };
     img.src = src;
   };
   r.readAsDataURL(file);
-  document.getElementById('drop-zone').style.display='none';
-  document.getElementById('results').style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('dz').style.display = 'none';
+  document.getElementById('res').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 
+/* ---------- helpers ---------- */
 function G(img,t){ return EXIF.getTag(img,t); }
 
 function sv(id, val, cls){
   var el = document.getElementById(id);
   if(!el) return;
-  if(val===undefined||val===null||val===''){ el.textContent='—'; el.className='val'; return; }
+  if(val === undefined || val === null || val === ''){
+    el.textContent = '—'; el.className = 'val'; return;
+  }
   el.textContent = val;
-  el.className = 'val'+(cls?' '+cls:'');
+  el.className = 'val' + (cls ? ' '+cls : '');
   cdata[id] = val;
 }
 
-function dms(d,ref){
+function dms(d, ref){
   if(!d) return null;
-  var v = d[0]+d[1]/60+d[2]/3600;
-  if(ref==='S'||ref==='W') v=-v;
+  var v = d[0] + d[1]/60 + d[2]/3600;
+  if(ref === 'S' || ref === 'W') v = -v;
   return v;
 }
 
-function populate(img, file){
+function bdg(l,t){ return '<span class="badge b'+t+'">'+l+'</span>'; }
+
+/* ---------- populate EXIF ---------- */
+function populate(img){
   var all = EXIF.getAllTags(img);
 
-  sv('make', G(img,'Make'));
-  sv('model', G(img,'Model'), 'hi');
-  sv('sw', G(img,'Software'));
+  sv('make',   G(img,'Make'));
+  sv('model',  G(img,'Model'), 'hi');
+  sv('sw',     G(img,'Software'));
   sv('artist', G(img,'Artist'));
 
-  sv('dto', G(img,'DateTimeOriginal')||G(img,'DateTime'), 'hi');
+  sv('dto', G(img,'DateTimeOriginal') || G(img,'DateTime'), 'hi');
   sv('dtd', G(img,'DateTimeDigitized'));
   sv('dtm', G(img,'DateTime'));
-  sv('tz', G(img,'OffsetTime')||G(img,'OffsetTimeOriginal'));
+  sv('tz',  G(img,'OffsetTime') || G(img,'OffsetTimeOriginal'));
 
-  var fn=G(img,'FNumber');
-  sv('ap', fn?'f/'+fn:null, 'hi');
-  var exp=G(img,'ExposureTime');
-  sv('ex', exp?(exp<1?'1/'+Math.round(1/exp)+'s':exp+'s'):null);
-  sv('iso', G(img,'ISOSpeedRatings')||G(img,'PhotographicSensitivity'));
-  var fl=G(img,'FocalLength'); sv('fl', fl?fl+' mm':null);
-  var fl35=G(img,'FocalLengthIn35mmFilm'); sv('fl35', fl35?fl35+' mm':null);
-  var flash=G(img,'Flash');
-  sv('flash', flash!==undefined?((flash&1)?'Disparou':'Não disparou'):null);
-  sv('em', ['Auto','Manual','Bracket'][G(img,'ExposureMode')]||null);
-  sv('wb', G(img,'WhiteBalance')===0?'Auto':G(img,'WhiteBalance')===1?'Manual':null);
+  var fn = G(img,'FNumber');
+  sv('ap', fn ? 'f/'+fn : null, 'hi');
+  var exp = G(img,'ExposureTime');
+  sv('ex', exp ? (exp < 1 ? '1/'+Math.round(1/exp)+'s' : exp+'s') : null);
+  sv('iso',  G(img,'ISOSpeedRatings') || G(img,'PhotographicSensitivity'));
+  var fl = G(img,'FocalLength');
+  sv('fl', fl ? fl+' mm' : null);
+  var fl35 = G(img,'FocalLengthIn35mmFilm');
+  sv('fl35', fl35 ? fl35+' mm' : null);
+  var flash = G(img,'Flash');
+  sv('flash', flash !== undefined ? ((flash & 1) ? 'Disparou' : 'Não disparou') : null);
+  sv('em', ['Auto','Manual','Bracket'][G(img,'ExposureMode')] || null);
+  sv('wb', G(img,'WhiteBalance') === 0 ? 'Auto' : G(img,'WhiteBalance') === 1 ? 'Manual' : null);
 
-  var xr=G(img,'XResolution'),yr=G(img,'YResolution');
-  sv('dpi', xr?xr+' × '+yr+' DPI':null);
-  var ori=G(img,'Orientation');
-  sv('ori', {1:'Normal',3:'180°',6:'90° CW',8:'90° CCW'}[ori]||(ori?'Código '+ori:null));
-  var csp=G(img,'ColorSpace');
-  sv('cs', csp===1?'sRGB':csp===65535?'Uncalibrated':csp?''+csp:null);
-  var c=G(img,'Compression'); sv('compr', c===6?'JPEG':c?'Tipo '+c:null);
-  var b=G(img,'BitsPerSample'); sv('bps', b?b+' bits':null);
+  var xr = G(img,'XResolution'), yr = G(img,'YResolution');
+  sv('dpi', xr ? xr+' × '+yr+' DPI' : null);
+  var ori = G(img,'Orientation');
+  sv('ori', ({1:'Normal',3:'180°',6:'90° CW',8:'90° CCW'})[ori] || (ori ? 'Código '+ori : null));
+  var csp = G(img,'ColorSpace');
+  sv('cs', csp === 1 ? 'sRGB' : csp === 65535 ? 'Uncalibrated' : csp ? ''+csp : null);
+  var c = G(img,'Compression');
+  sv('compr', c === 6 ? 'JPEG' : c ? 'Tipo '+c : null);
+  var b = G(img,'BitsPerSample');
+  sv('bps', b ? b+' bits' : null);
 
-  // Badges
-  var sr=document.getElementById('sr');
-  var hm=!!G(img,'Make'), hd=!!(G(img,'DateTimeOriginal')||G(img,'DateTime'));
-  sr.innerHTML = bdg(hm?'EXIF OK':'Sem EXIF',hm?'ok':'no')+bdg(hd?'Data OK':'Sem data',hd?'info':'no');
+  /* badges */
+  var sr = document.getElementById('sr');
+  var hm = !!G(img,'Make'), hd = !!(G(img,'DateTimeOriginal') || G(img,'DateTime'));
+  sr.innerHTML = bdg(hm ? 'EXIF OK' : 'Sem EXIF', hm ? 'ok' : 'no')
+               + bdg(hd ? 'Data OK'  : 'Sem data',  hd ? 'in' : 'no');
 
-  // GPS
-  var lat=dms(G(img,'GPSLatitude'),G(img,'GPSLatitudeRef'));
-  var lon=dms(G(img,'GPSLongitude'),G(img,'GPSLongitudeRef'));
-  var altv=G(img,'GPSAltitude'), altRef=G(img,'GPSAltitudeRef');
+  /* GPS */
+  var lat = dms(G(img,'GPSLatitude'),  G(img,'GPSLatitudeRef'));
+  var lon = dms(G(img,'GPSLongitude'), G(img,'GPSLongitudeRef'));
+  var altv   = G(img,'GPSAltitude');
+  var altRef = G(img,'GPSAltitudeRef');
 
-  if(lat!==null && lon!==null){
-    document.getElementById('gps-found').style.display='block';
-    document.getElementById('no-gps').style.display='none';
-    document.getElementById('lat').textContent=lat.toFixed(6);
-    document.getElementById('lon').textContent=lon.toFixed(6);
-    document.getElementById('alt').textContent=altv!==undefined?(altRef===1?'−':'')+Number(altv).toFixed(1)+' m':'—';
-    var dop=G(img,'GPSDOP'); sv('gdop', dop?'±'+Number(dop).toFixed(1)+' m':null);
-    var dir=G(img,'GPSImgDirection'); sv('gdir', dir?Number(dir).toFixed(1)+'°':null);
-    document.getElementById('glink').href='https://www.google.com/maps?q='+lat+','+lon;
+  if(lat !== null && lon !== null){
+    document.getElementById('gps-found').style.display = 'block';
+    document.getElementById('no-gps').style.display    = 'none';
+    document.getElementById('lat').textContent = lat.toFixed(6);
+    document.getElementById('lon').textContent = lon.toFixed(6);
+    document.getElementById('alt').textContent = altv !== undefined
+      ? (altRef === 1 ? '−' : '') + Number(altv).toFixed(1)+' m' : '—';
+    var dop = G(img,'GPSDOP');
+    sv('gdop', dop ? '±'+Number(dop).toFixed(1)+' m' : null);
+    var dir = G(img,'GPSImgDirection');
+    sv('gdir', dir ? Number(dir).toFixed(1)+'°' : null);
+
+    cdata.latitude  = lat;
+    cdata.longitude = lon;
     sr.innerHTML += bdg('GPS OK','ok');
-    cdata.latitude=lat; cdata.longitude=lon;
-    initMap(lat,lon);
+
+    /* Google Maps link */
+    document.getElementById('glink').href =
+      'https://www.google.com/maps?q='+lat+','+lon;
+
+    /* OpenStreetMap embed — works on HTTPS, no JS library needed */
+    var bbox = 0.005;
+    var osmUrl = 'https://www.openstreetmap.org/export/embed.html'
+      + '?bbox='+(lon-bbox)+','+(lat-bbox)+','+(lon+bbox)+','+(lat+bbox)
+      + '&layer=mapnik'
+      + '&marker='+lat+','+lon;
+    document.getElementById('map-iframe').src = osmUrl;
+
   } else {
-    document.getElementById('gps-found').style.display='none';
-    document.getElementById('no-gps').style.display='block';
+    document.getElementById('gps-found').style.display = 'none';
+    document.getElementById('no-gps').style.display    = 'block';
     sr.innerHTML += bdg('Sem GPS','no');
   }
 
-  // All tags
-  var tc=document.getElementById('tags-body'); tc.innerHTML='';
+  /* all tags table */
+  var tc = document.getElementById('tbody');
+  tc.innerHTML = '';
   Object.entries(all).forEach(function(e){
-    if(e[0]==='undefined'||e[0]==='MakerNote'||e[0]==='UserComment') return;
-    var v=Array.isArray(e[1])?e[1].join(', '):(typeof e[1]==='object'&&e[1]?JSON.stringify(e[1]):e[1]);
-    var d=document.createElement('div'); d.className='row';
-    d.innerHTML='<span class="lbl">'+e[0]+'</span><span class="val">'+v+'</span>';
+    if(e[0] === 'undefined' || e[0] === 'MakerNote' || e[0] === 'UserComment') return;
+    var v = Array.isArray(e[1]) ? e[1].join(', ')
+          : (typeof e[1] === 'object' && e[1] ? JSON.stringify(e[1]) : e[1]);
+    var d = document.createElement('div');
+    d.className = 'row';
+    d.innerHTML = '<span class="lbl">'+e[0]+'</span><span class="val">'+v+'</span>';
     tc.appendChild(d);
   });
 }
 
-function bdg(l,t){ return '<span class="badge b-'+t+'">'+l+'</span>'; }
-
-function initMap(lat,lon){
-  if(lmap){lmap.remove();lmap=null;}
-  setTimeout(function(){
-    lmap = L.map('map',{zoomControl:true,attributionControl:false}).setView([lat,lon],15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(lmap);
-    var icon = L.divIcon({
-      className:'',
-      html:'<div style="width:18px;height:18px;background:#c8ff57;border:3px solid #0a0a0b;border-radius:50%;box-shadow:0 0 0 4px rgba(200,255,87,0.3);"></div>',
-      iconSize:[18,18], iconAnchor:[9,9]
-    });
-    L.marker([lat,lon],{icon:icon}).addTo(lmap);
-  },100);
+/* ---------- map iframe callback ---------- */
+function iframeLoaded(){
+  var iframe = document.getElementById('map-iframe');
+  var spin   = document.getElementById('map-spin');
+  iframe.classList.add('rdy');
+  spin.style.opacity = '0';
+  setTimeout(function(){ spin.style.display = 'none'; }, 300);
 }
 
+/* ---------- toggle all tags ---------- */
 function toggleTags(){
-  var c=document.getElementById('tags-body'), b=document.getElementById('tbtn');
-  var open=c.style.display==='block';
-  c.style.display=open?'none':'block';
-  b.textContent=open?'Mostrar todos os campos EXIF':'Ocultar campos EXIF';
+  var c = document.getElementById('tbody'), b = document.getElementById('tbtn');
+  var open = c.style.display === 'block';
+  c.style.display = open ? 'none' : 'block';
+  b.textContent = open ? 'Mostrar todos os campos EXIF' : 'Ocultar campos EXIF';
 }
 
+/* ---------- export JSON ---------- */
 function exportJSON(){
-  var blob=new Blob([JSON.stringify(cdata,null,2)],{type:'application/json'});
-  var a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='photo-metadata.json'; a.click();
+  var blob = new Blob([JSON.stringify(cdata, null, 2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'photo-metadata.json';
+  a.click();
 }
 
+/* ---------- reset ---------- */
 function reset(){
-  if(lmap){lmap.remove();lmap=null;}
-  document.getElementById('drop-zone').style.display='block';
-  document.getElementById('results').style.display='none';
-  document.getElementById('fi').value='';
-  document.getElementById('tags-body').style.display='none';
-  document.getElementById('tbtn').textContent='Mostrar todos os campos EXIF';
-  cdata={};
-  window.scrollTo({top:0,behavior:'smooth'});
+  document.getElementById('dz').style.display  = 'block';
+  document.getElementById('res').style.display = 'none';
+  document.getElementById('fi').value = '';
+  document.getElementById('map-iframe').src = '';
+  document.getElementById('map-iframe').classList.remove('rdy');
+  document.getElementById('map-spin').style.display  = 'flex';
+  document.getElementById('map-spin').style.opacity  = '1';
+  document.getElementById('tbody').style.display = 'none';
+  document.getElementById('tbtn').textContent = 'Mostrar todos os campos EXIF';
+  cdata = {};
+  window.scrollTo({top:0, behavior:'smooth'});
 }
 </script>
 </body>
